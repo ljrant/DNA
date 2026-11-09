@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a30">
+  <meta name="description" content="Build nucleotides, assemble antiparallel DNA strands, and explore the double helix in an interactive biology lab.">
+  <title>DNA Builder Lab — Interactive Molecular Biology</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">⬡</div>
+        <div><strong>DNA BUILDER <span>LAB</span></strong><small>Learn by constructing life’s code</small></div>
+      </div>
+      <div class="header-actions">
+        <span class="version">BIOLOGY SIMULATOR · v1</span>
+        <span class="score" id="score">✦ 0 XP</span>
+        <button type="button" id="saveBtn" class="button subtle">Save</button>
+        <button type="button" id="exportBtn" class="button subtle">Export</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar panel">
+        <div class="panel-header"><div class="eyebrow">01 / COMPONENT LIBRARY</div><h2>Molecular blocks</h2><p>Drag into the lab or tap to add. Each block can be reused.</p></div>
+        <h3 class="group-label">Backbone components</h3>
+        <div class="block-list" id="backbonePalette">
+          <button type="button" draggable="true" class="palette-item" data-add="phosphate"><span class="item-icon phosphate">P</span><span><strong>Phosphate</strong><small>5′ backbone group</small></span><span class="plus">+</span></button>
+          <button type="button" draggable="true" class="palette-item" data-add="deoxyribose"><span class="item-icon sugar">D</span><span><strong>Deoxyribose</strong><small>DNA sugar</small></span><span class="plus">+</span></button>
+          <button type="button" draggable="true" class="palette-item" data-add="ribose"><span class="item-icon ribose">R</span><span><strong>Ribose</strong><small>RNA comparison</small></span><span class="plus">+</span></button>
+        </div>
+        <h3 class="group-label">Nitrogenous bases</h3>
+        <div class="base-palette">
+          <button type="button" draggable="true" class="palette-base base-a" data-add="A"><strong>A</strong><small>Adenine</small></button>
+          <button type="button" draggable="true" class="palette-base base-t" data-add="T"><strong>T</strong><small>Thymine</small></button>
+          <button type="button" draggable="true" class="palette-base base-c" data-add="C"><strong>C</strong><small>Cytosine</small></button>
+          <button type="button" draggable="true" class="palette-base base-g" data-add="G"><strong>G</strong><small>Guanine</small></button>
+        </div>
+        <button type="button" class="rna-item" data-add="U"><span>U · Uracil</span><small>RNA only — try to compare</small></button>
+        <div class="sidebar-tip"><strong>Lab technique</strong><p>Connect components by dragging them near a sugar, or select one block and then another. A base attaches at 1′; phosphate at 5′.</p></div>
+        <div class="sidebar-actions"><button type="button" id="undoBtn" class="button subtle">↶ Undo</button><button type="button" id="redoBtn" class="button subtle">↷ Redo</button></div>
+        <button type="button" class="text-button" id="clearBoardBtn">Clear assembly bench</button>
+      </aside>
+
+      <main class="workspace-column">
+        <section class="mode-strip" aria-label="Learning modes">
+          <button type="button" data-mode="nucleotide" class="mode selected"><span>01</span> Nucleotide</button>
+          <button type="button" data-mode="strand" class="mode"><span>02</span> DNA strand</button>
+          <button type="button" data-mode="duplex" class="mode"><span>03</span> Double DNA</button>
+          <button type="button" data-mode="repair" class="mode"><span>04</span> Repair</button>
+          <button type="button" data-mode="free" class="mode"><span>∞</span> Free lab</button>
+        </section>
+
+        <section class="challenge-card">
+          <div><div class="eyebrow accent" id="challengeTag">CHALLENGE 01 · THE FIRST NUCLEOTIDE</div><h1 id="challengeTitle">Build a DNA nucleotide</h1><p id="challengeText">Assemble deoxyribose, phosphate, and adenine on the bench.</p></div>
+          <div class="challenge-actions">
+            <button type="button" id="hintBtn" class="button subtle">Hint</button>
+            <button type="button" id="checkBtn" class="button primary">Check work</button>
+            <button type="button" id="newBtn" class="button icon-only" aria-label="New challenge" title="New challenge">↻</button>
+          </div>
+        </section>
+
+        <section class="canvas-card">
+          <div class="section-heading">
+            <div><div class="eyebrow">ASSEMBLY STATION</div><h2>Molecular workbench <span class="live-dot"></span></h2></div>
+            <div class="toolbar">
+              <button type="button" id="zoomOutBtn" aria-label="Zoom out" title="Zoom out">−</button>
+              <button type="button" id="zoomResetBtn" aria-label="Reset zoom" title="Reset zoom">⌖</button>
+              <button type="button" id="zoomInBtn" aria-label="Zoom in" title="Zoom in">+</button>
+              <button type="button" id="deleteBlockBtn" aria-label="Delete selected building block" title="Delete selected building block">⌫</button>
+            </div>
+          </div>
+          <div class="canvas-wrap" id="boardDrop">
+            <svg id="board" viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Drag-and-drop nucleotide construction board. Select a component then another to connect them.">
+              <defs><pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1.1" fill="#33425a"/></pattern></defs>
+              <rect width="100%" height="100%" fill="url(#grid)"></rect>
+              <g id="bondLayer"></g><g id="blockLayer"></g>
+            </svg>
+            <div class="canvas-help">DRAG • SNAP • BUILD <span>5′ phosphate ← sugar → 1′ base</span></div>
+          </div>
+          <div class="bench-footer"><div class="mini-metric"><strong id="blockCount">0</strong><span>Blocks</span></div><div class="mini-metric"><strong id="bondCount">0</strong><span>Bonds</span></div><div class="mini-metric"><strong id="readyCount">0</strong><span>Ready nucleotides</span></div><button type="button" id="collectBtn" class="button secondary">Collect completed nucleotide <span>→</span></button></div>
+        </section>
+
+        <section class="strand-card">
+          <div class="section-heading">
+            <div><div class="eyebrow">GENETIC ASSEMBLY</div><h2>DNA strands</h2><p>Place your assembled nucleotides into a strand. The strands must run in opposite directions.</p></div>
+            <button type="button" id="joinBtn" class="button secondary">Verify &amp; join strands</button>
+          </div>
+          <div class="tray"><div class="tray-top"><strong>Available nucleotides <span id="trayCount" class="counter">0</span></strong><span>Drag onto a strand, or select a destination and tap a nucleotide</span></div><div id="trayItems" class="tray-items"></div></div>
+          <div class="strand-choice">
+            <span>Add to:</span>
+            <button type="button" class="lane-switch active" data-active-lane="primary">Top · 5′ → 3′</button>
+            <button type="button" class="lane-switch" data-active-lane="secondary">Bottom · 3′ → 5′</button>
+          </div>
+          <div class="strands" id="strands">
+            <div class="strand-row"><span class="end-label">5′</span><div class="strand-drop" data-lane="primary" id="primaryLane"></div><span class="end-label">3′</span></div>
+            <div id="pairRungs" class="pair-rungs"></div>
+            <div class="strand-row"><span class="end-label">3′</span><div class="strand-drop" data-lane="secondary" id="secondaryLane"></div><span class="end-label">5′</span></div>
+          </div>
+          <div class="sequence-data"><div><small>TOP STRAND · 5′ → 3′</small><code id="primarySequence">—</code></div><div><small>BOTTOM STRAND · 3′ → 5′</small><code id="secondarySequence">—</code></div><div class="paired-pill" id="pairStatus">0 paired</div></div>
+          <div class="helix-cta"><div><strong>Ready to see the double helix?</strong><small>Pair all bases correctly to unlock a rotatable right-handed B-DNA model.</small></div><button type="button" class="button primary" id="helixBtn" disabled>Explore 3D helix ↗</button></div>
+        </section>
+        <div id="feedback" class="feedback info" role="status" aria-live="polite">Select a block from the library to begin building.</div>
+      </main>
+
+      <aside class="sidebar panel inspector">
+        <div class="panel-header"><div class="eyebrow">02 / DISCOVERY PANEL</div><h2>Biology inspector</h2><p>Real-time molecular insight</p></div>
+        <div class="inspector-figure"><div class="molecule-symbol">5′<span>⬡</span>1′</div><strong id="selectionTitle">No component selected</strong><p id="selectionDetail">Select a molecular building block to inspect its role in DNA structure.</p></div>
+        <div class="info-card"><div class="eyebrow">STRUCTURE CHECK</div><div class="info-row"><span>DNA sugars</span><strong id="sugarMetric">0</strong></div><div class="info-row"><span>Completed units</span><strong id="unitMetric">0</strong></div><div class="info-row"><span>Valid base pairs</span><strong id="pairMetric">0</strong></div><div class="info-row"><span>Strand orientation</span><strong>Antiparallel</strong></div></div>
+        <div class="fact-card"><span class="fact-star">✳</span><strong>Why 5′ and 3′ matter</strong><p>DNA nucleotides form a sugar–phosphate backbone through 3′–5′ phosphodiester linkages. The two strands in a DNA double helix are antiparallel.</p></div>
+        <details class="teacher-panel"><summary>Teacher tools <span>⌄</span></summary><label for="teacherSequence">Custom target DNA sequence</label><input id="teacherSequence" maxlength="24" placeholder="e.g. ATGCCA" autocomplete="off" spellcheck="false"><button type="button" id="teacherBtn" class="button secondary">Set strand challenge</button></details>
+        <div class="teacher-note">Model note: this is an educational construction simulator, not atom-by-atom chemistry. Living cells use enzymes and activated nucleotide triphosphates during DNA synthesis.</div>
+      </aside>
+    </div>
+    <footer>DNA BUILDER LAB <span>·</span> A classroom-friendly molecular construction simulation <span>·</span> All progress is stored locally on this device.</footer>
+  </div>
+
+  <div id="helixModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="helixTitle">
+    <div class="modal-card">
+      <div class="modal-head"><div><div class="eyebrow accent">STRUCTURE EXPLORER</div><h2 id="helixTitle">Your B-DNA double helix</h2><p>Drag to rotate. Scroll or use the controls to zoom.</p></div><button type="button" id="closeHelixBtn" class="button subtle">Close ✕</button></div>
+      <canvas id="helixCanvas" width="1000" height="600" aria-label="3D projection of right-handed B-DNA with external sugar phosphate backbones and complementary base pairs"></canvas>
+      <div class="modal-foot"><div><strong id="helixSequence"></strong><small>Right-handed · ~10.5 base pairs per turn · 0.34 nm rise per base pair</small></div><div><button type="button" id="helixZoomOut" class="button subtle">−</button><button type="button" id="helixZoomIn" class="button subtle">+</button></div></div>
+    </div>
+  </div>
+  <input type="file" id="importInput" accept=".json,application/json" hidden>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
